@@ -1,20 +1,57 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-
-export default function App() {
+import React, { useEffect, useState } from 'react-native'
+import './App.css';
+import Recipe from './Recipe';
+  
+const App = () => {
+  const APP_ID = <app_1/>;
+  const APP_KEY = <app_key/>;
+  const [recetas, setRecetas] = useState([]);
+  const [busqueda, setSearch] = useState("");
+  const [query, setQuery] = useState("pollo");
+  useEffect(() => {
+    getRecetas();
+  }, [query])
+  const getRecetass = async () => {
+    const response = await fetch
+          (`https://api.edamam.com/search?q=${query}&app_id=${APP_ID}&app_key=${APP_KEY}`);
+    const data = await response.json();
+    setRecetas(data.hits);
+    // console.log(data);
+  
+  };
+  const actualizarBusqueda = e => {
+    setSearch(e.target.value);
+  };
+  const getSearch = e => {
+    e.preventDefault();
+    setQuery(busqueda);
+    setSearch("");
+  }
+  
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <div className="App">
+      <form className="search-form" onSubmit={getSearch}  >
+        <input className="search-bar" type="text" value={busqueda}
+             onChange={actualizarBusqueda} />
+        <button className="search-button" type="submit" >
+             Search
+        </button>
+      </form>
+      <div className="recetas">
+        {recetas.map(receta => (
+          <Recipe
+            llave ={receta.recipe.label}
+            titulo ={receta.recipe.label}
+            calorias ={receta.recipe.calories}
+            imagen ={receta.recipe.image}
+            ingredientes ={receta.recipe.ingredients}
+          />
+  
+        ))}
+      </div>
+  
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  
+export default App;
